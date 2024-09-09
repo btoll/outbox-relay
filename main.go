@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -16,7 +17,6 @@ var (
 	serviceName   *string
 	image         *string
 	dbName        *string
-	environments  = []string{"development", "beta", "production"}
 )
 
 type Image struct {
@@ -26,7 +26,6 @@ type Image struct {
 
 type Service struct {
 	Name  string
-	Env   string
 	Image *Image
 }
 
@@ -45,7 +44,7 @@ func UsageErr(s string) {
 
 func main() {
 	serviceName = flag.String("name", "", "The name of the service")
-	image = flag.String("image", "", "The name of the image and tag (i.e., nginx:latest) to use for the service")
+	image = flag.String("image", "", "The name of the image and tag (i.e., `nginx:latest`) to use for the service")
 	dbName = flag.String("dbName", "", "The name of the database")
 	flag.Parse()
 
@@ -60,7 +59,6 @@ func main() {
 
 	s := &Service{
 		Name: *serviceName,
-		Env:  "development",
 		Image: &Image{
 			Name: imageInfo[0],
 			Tag:  imageInfo[1],
@@ -70,10 +68,9 @@ func main() {
 	t := template.Must(template.ParseFS(templateFiles, "tpl/*"))
 	for _, tpl := range t.Templates() {
 		tplName := tpl.Name()
-		tplPath := fmt.Sprintf("tpl/%s", tplName)
-		tmpl, err := template.New(tplName).ParseFiles(tplPath)
+		tmpl, err := template.New(tplName).ParseFiles(fmt.Sprintf("tpl/%s", tplName))
 		IfErr(err)
-		dirPath := fmt.Sprintf("build/%s/", s.Name)
+		dirPath := filepath.Join("build", s.Name)
 		dirs := strings.Split(tplName, "_")
 		filename := dirs[len(dirs)-1]
 		// The `tplName` is made up of dirPath-filename.
@@ -83,14 +80,14 @@ func main() {
 		// So, in the loop below, only construct the directory path from
 		// 0 - N-1 (N-1 being the filename, of course).
 		for _, d := range dirs[0 : len(dirs)-1] {
-			dirPath += fmt.Sprintf("%s/", d)
+			dirPath = filepath.Join(dirPath, d)
 		}
 		err = os.MkdirAll(dirPath, os.ModePerm)
 		IfErr(err)
 		if filename != "env" {
 			filename += ".yaml"
 		}
-		f, err := os.Create(fmt.Sprintf("%s/%s", dirPath, filename))
+		f, err := os.Create(filepath.Join(dirPath, filename))
 		IfErr(err)
 		IfErr(tmpl.Execute(f, *s))
 	}

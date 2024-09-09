@@ -1,6 +1,2 @@
 AION.Host__ApplicationName={{ .Name }}
 ASPNETCORE_ENVIRONMENT=beta
-Aion.Kafka.OutboxRelay.Settings__DatabaseName=PEC_Subscriptions
-AwsAssumeRoleArn=arn:aws:iam::936453173531:role/Secret_Reader
-AwsRegion=ca-central-1
-aion-db-application__ConnectionStrings__PEC_Subscriptions=Server=beta-aiondb.cq7uxwnwuf49.ca-central-1.rds.amazonaws.com;Port=5432;Database=PEC_Subscriptions;Username=pec_postgres;Password=P3Cp0stgr3s
