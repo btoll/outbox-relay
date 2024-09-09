@@ -1,0 +1,17 @@
+resources:
+- ../../base
+
+replicas:
+- name: {{ .Name }}
+  count: 1
+
+configMapGenerator:
+- name: env-{{ .Name }}
+  envs:
+  - env
+
+images:
+- name: 451310829282.dkr.ecr.us-east-1.amazonaws.com/aion/{{ .Image.Name }}
+  newName: 451310829282.dkr.ecr.us-east-1.amazonaws.com/aion/{{ .Image.Name }}
+  newTag: {{ .Image.Tag }}
+

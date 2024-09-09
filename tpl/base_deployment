@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: {{ .Name }}
+  labels:
+    kafka: "true"
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: {{ .Name }}
+          image: 451310829282.dkr.ecr.us-east-1.amazonaws.com/aion/{{ .Image.Name }}:{{ .Image.Tag }}
+          imagePullPolicy: Always
+          envFrom:
+          - configMapRef:
+              name: env-{{ .Name }}
+          - configMapRef:
+              name: kubernetes-container-user
+      nodeSelector:
+        node_type: default
+

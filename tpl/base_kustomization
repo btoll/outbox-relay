@@ -1,0 +1,7 @@
+namespace: default
+commonLabels:
+  app: {{ .Name }}
+
+resources:
+  - deployment.yaml
+
